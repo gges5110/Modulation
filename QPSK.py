@@ -1,4 +1,3 @@
-import math
 from random import random
 from matplotlib import pyplot as plt
 import numpy as np
@@ -41,8 +40,6 @@ samples = Fs / carrier_frequency * data_size / 2
 samples_per_symbol = Fs / carrier_frequency
 
 
-
-
 # Data generation
 data = np.arange(data_size)
 for n in range(0, data_size):
@@ -65,15 +62,23 @@ for n in range(1, data_size, 2):
 
 
 # Generate I/Q carrier
-I_carrier = np.arange(samples, dtype=np.float_)
-Q_carrier = np.arange(samples, dtype=np.float_)
-for n in range(samples):
-    I_carrier[n] = math.sin(2 * math.pi * carrier_frequency * n / Fs)
-    Q_carrier[n] = math.cos(2 * math.pi * carrier_frequency * n / Fs)
+t = np.arange(samples)
+
+I_carrier = np.sin(2 * 3.14 * carrier_frequency * t / Fs)
+Q_carrier = np.cos(2 * 3.14 * carrier_frequency * t / Fs)
 
 plt.figure(1)
-plt.plot(np.arange(samples), I_carrier, np.arange(samples), Q_carrier)
+plt.plot(t, I_carrier, t, Q_carrier)
 plt.title('I carrier and Q carrier')
+plt.draw()
+
+I_spectrum = np.fft.fft(I_carrier)
+Q_spectrum = np.fft.fft(Q_carrier)
+freq = np.fft.fftfreq(t.shape[-1])
+
+plt.figure(2)
+plt.plot(freq, np.absolute(I_spectrum), freq, np.absolute(Q_spectrum))
+plt.title('I carrier spectrum')
 plt.draw()
 
 # Modulate carrier with I/Q data
@@ -91,7 +96,7 @@ for n in range(data_size / 2):
 
 # Add the I/Q data in time domain
 transmit_signal = I_modulated + Q_modulated
-plt.figure(2)
+plt.figure(3)
 plt.plot(np.arange(samples), I_modulated, np.arange(samples), Q_modulated, np.arange(samples), transmit_signal)
 plt.title('Transmit signal')
 plt.draw()
