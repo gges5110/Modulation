@@ -3,33 +3,41 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 def symbol_modulate(QPSK_symbol):
+    # Constellation
+    # 00 -> A * exp( j * pi / 4)  = 1 + j
+    # 01 -> A * exp( j * 3pi / 4) = -1 + j
+    # 11 -> A * exp(-j * 3pi / 4) = -1 - j
+    # 10 -> A * exp(-j * pi / 4) = 1 - j
+
     I_sign = 0
     Q_sign = 0
 
     if QPSK_symbol[0] == 0:
-        I_sign = -1
+        Q_sign = 1
     else:
-        I_sign = 1
+        Q_sign = -1
 
     if QPSK_symbol[1] == 0:
-        Q_sign = -1
+        I_sign = 1
     else:
-        Q_sign = 1
+        I_sign = -1
 
     return I_sign, Q_sign
 
 def symbol_demodulate(QPSK_signal):
+    # See the constellation in modulation.
     I_data = 0
     Q_data = 0
-    if QPSK_signal[0] > 0:
-        I_data = 1
-    else:
-        I_data = 0
 
-    if QPSK_signal[1] > 0:
-        Q_data = 1
-    else:
+    if QPSK_signal.real > 0:
         Q_data = 0
+    else:
+        Q_data = 1
+
+    if QPSK_signal.imag > 0:
+        I_data = 0
+    else:
+        I_data = 1
 
     return I_data, Q_data
 
@@ -115,7 +123,7 @@ for n in range(len(I_data)):
     I_integral = np.sum(receive_signal[start: end] * I_carrier[start: end])
     Q_integral = np.sum(receive_signal[start: end] * Q_carrier[start: end])
 
-    I_demodulated[n], Q_demodulated[n] = symbol_demodulate([I_integral, Q_integral])
+    I_demodulated[n], Q_demodulated[n] = symbol_demodulate(np.complex(I_integral, Q_integral))
 
 
 print "I demodulated:", I_demodulated, "actual data:", I_data
