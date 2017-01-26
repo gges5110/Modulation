@@ -1,3 +1,4 @@
+
 from random import random
 from matplotlib import pyplot as plt
 import numpy as np
@@ -47,7 +48,6 @@ data_size = 10
 samples = Fs / carrier_frequency * data_size / 2
 samples_per_symbol = Fs / carrier_frequency
 
-
 # Data generation
 data = np.arange(data_size)
 for n in range(0, data_size):
@@ -68,12 +68,11 @@ for n in range(0, data_size, 2):
 for n in range(1, data_size, 2):
     Q_data[n / 2] = data[n]
 
-
 # Generate I/Q carrier
-t = np.arange(samples)
+t = np.arange(start = 0, stop = samples * 0.000125, step = 0.000125)
 
-I_carrier = np.sin(2 * 3.14 * carrier_frequency * t / Fs)
-Q_carrier = np.cos(2 * 3.14 * carrier_frequency * t / Fs)
+I_carrier = np.sin(2 * 3.14 * carrier_frequency * t)
+Q_carrier = np.cos(2 * 3.14 * carrier_frequency * t)
 
 plt.figure(1)
 plt.plot(t, I_carrier, t, Q_carrier)
@@ -82,11 +81,11 @@ plt.draw()
 
 I_spectrum = np.fft.fft(I_carrier)
 Q_spectrum = np.fft.fft(Q_carrier)
-freq = np.fft.fftfreq(t.shape[-1])
+freq = np.fft.fftfreq(t.shape[-1], d = 0.000125)
 
 plt.figure(2)
-plt.plot(freq, np.absolute(I_spectrum), freq, np.absolute(Q_spectrum))
-plt.title('I carrier spectrum')
+plt.plot(freq, np.absolute(I_spectrum) / (samples / 2), 'ro', freq, np.absolute(Q_spectrum) / (samples / 2), 'bo')
+plt.title('IQ carrier spectrum')
 plt.draw()
 
 # Modulate carrier with I/Q data
